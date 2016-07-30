@@ -361,7 +361,7 @@ static void update_times(){
   //set next hour center and position
   GPoint nhour_box_center = time_points[nextHour % 12];
   snprintf(buffer, 3, "%d", nextHour);
-  text_block_set_text(s_nhour_text, buffer, GColorMayGreen);
+  PBL_IF_COLOR_ELSE(text_block_set_text(s_nhour_text, buffer, GColorMayGreen), text_block_set_text(s_nhour_text, buffer, GColorLightGray));
   //set hour text
   snprintf(buffer, 3, "%d", hour);
   text_block_set_text(s_hour_text, buffer, GColorWhite);
@@ -410,12 +410,12 @@ static void update_hour_hand_layer(Layer * layer, GContext * ctx){
   const float hand_angle = angle(s_current_time.hour * 50 + s_current_time.minute * 50 / 60, 600);
   const GPoint hand_end = gpoint_on_circle(s_center, hand_angle, HOUR_HAND_RADIUS);
   graphics_context_set_stroke_width(ctx, HOUR_HAND_STROKE);
-  graphics_context_set_stroke_color(ctx, GColorBlueMoon);
+  PBL_IF_COLOR_ELSE(graphics_context_set_stroke_color(ctx, GColorBlueMoon), graphics_context_set_stroke_color(ctx, GColorLightGray));
   graphics_draw_line(ctx, s_center, hand_end);
 }
 
 static void update_center_circle_layer(Layer * layer, GContext * ctx){
-  graphics_context_set_fill_color(ctx, GColorBabyBlueEyes);
+  PBL_IF_COLOR_ELSE(graphics_context_set_fill_color(ctx, GColorBabyBlueEyes), graphics_context_set_fill_color(ctx, GColorDarkGray));
   graphics_fill_circle(ctx, s_center, HOUR_CIRCLE_RADIUS);
 }
 
@@ -423,7 +423,7 @@ static void update_center_circle_layer(Layer * layer, GContext * ctx){
 static void draw_tick(GContext *ctx, const int index){
   int i = 0;
   graphics_context_set_stroke_width(ctx, TICK_STROKE);
-  graphics_context_set_stroke_color(ctx, GColorMayGreen);
+  PBL_IF_COLOR_ELSE(graphics_context_set_stroke_color(ctx, GColorMayGreen), graphics_context_set_stroke_color(ctx,GColorLightGray));
   for(i=0;i<12;i++){
     graphics_draw_line(ctx, ticks_points[i][0],ticks_points[i][1]);
     
@@ -462,7 +462,8 @@ static void update_info_layer(){
   //const GColor info_color = config_get_color(s_config, ConfigKeyInfoColor);
   //text_block_set_text(s_north_info, info_buffer, info_color);
   if(weather_valid)text_block_set_text(s_north_info, info_buffer, GColorWhite);
-  else text_block_set_text(s_north_info, info_buffer, GColorMayGreen);
+  else PBL_IF_BW_ELSE(text_block_set_text(s_north_info, info_buffer, GColorMayGreen), 
+                      text_block_set_text(s_north_info, info_buffer, GColorLightGray));
   //TRY TO DODGE ANY HANDS THAT MAY BE IN THE WAY
   const ShiftLocation move = dodge_hands(theWeather);
   if(move == left){
